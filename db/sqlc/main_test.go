@@ -15,15 +15,20 @@ const (
 )
 
 var testQueries *Queries
+var testDB *sql.DB
 
 func TestMain(m *testing.M) {
-	conn, err := sql.Open(dbDriver, dbSource)
+	var err error
+	testDB, err = sql.Open(dbDriver, dbSource)
 
 	if err != nil {
-		log.Fatal("Can not connect to db", err)
+		log.Fatalf("Cannot connect to the database: %v", err)
+	}
+	if err := testDB.Ping(); err != nil {
+		log.Fatalf("Database is not reachable: %v", err)
 	}
 
-	testQueries = New(conn)
+	testQueries = New(testDB)
 
 	os.Exit(m.Run())
 }
